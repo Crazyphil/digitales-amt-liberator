@@ -1,6 +1,8 @@
 *.iml
 .gradle
+/keystore.properties
 /local.properties
+/release.keystore
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml

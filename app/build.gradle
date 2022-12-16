@@ -3,7 +3,27 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def keystoreProperties = new Properties()
+if (System.getenv('CI') != null) {
+    keystoreProperties.setProperty('build.storePassword', System.getenv('STORE_PASSWORD'))
+    keystoreProperties.setProperty('build.keyAlias', System.getenv('KEY_ALIAS'))
+    keystoreProperties.setProperty('build.keyPassword', System.getenv('KEY_PASSWORD'))
+}
+
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
+    signingConfigs {
+        release {
+            storeFile file('../release.keystore')
+            storePassword keystoreProperties['build.storePassword']
+            keyAlias keystoreProperties['build.keyAlias']
+            keyPassword keystoreProperties['build.keyPassword']
+        }
+    }
     compileSdk 32
 
     defaultConfig {
@@ -18,6 +38,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {

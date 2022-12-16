@@ -1,0 +1,81 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  apk:
+    name: Generate APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: adopt
+          java-version: 11
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build debug APK
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleDebug
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Extract keystore to disk
+        run: 'echo "${{ secrets.STORE_FILE }}" | base64 -d > ./release.keystore'
+        shell: bash
+
+      - name: Build release APK
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleRelease
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Remove keystore from disk
+        run: rm ./release.keystore
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk
+          path: app/build/outputs/apk/release/app-release.apk
+
+  release:
+    name: Release APK
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK from build
+        uses: actions/download-artifact@v1
+        with:
+          name: apk
+
+      - name: Upload Release APK
+        uses: softprops/action-gh-release@v1
+        with:
+          files: apk/*
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
