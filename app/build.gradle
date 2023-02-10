@@ -26,8 +26,9 @@ android {
     }
     compileSdk 32
 
+    namespace "it.kapfer.digitalesamt.liberator"
     defaultConfig {
-        applicationId "it.kapfer.digitalesamt.liberator"
+        applicationId android.namespace
         minSdk 21
         targetSdk 32
         versionCode 1
