@@ -16,7 +16,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Removes root and bootloader checks from the Digitales Amt app" />
+            android:value="Removes root and bootloader checks from the Austrian e-government apps" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
