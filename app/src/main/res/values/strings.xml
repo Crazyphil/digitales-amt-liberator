@@ -2,4 +2,5 @@
     <string name="app_name">Digitales Amt Liberator</string>
     <string name="digitales_amt_package_name" translatable="false">at.gv.oe.app</string>
     <string name="bmf2go_package_name" translatable="false">at.gv.bmf.bmf2go</string>
+    <string name="edudigicard_package_name">at.asitplus.digitalid.wallet.pupilid</string>
 </resources>
