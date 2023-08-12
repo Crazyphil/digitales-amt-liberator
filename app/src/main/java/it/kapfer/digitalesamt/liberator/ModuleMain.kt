@@ -11,8 +11,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 // Classes to hook in Digitales Amt app
 const val DEVICE_INTEGRITY_CHECK_CLASS: String = "at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck"
 // Classes to hook in FON [+] app
-const val ROOTBEER_CLASS: String = "com.scottyab.rootbeer.b"
-const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.AttestationHelper"
+const val ROOTBEER_CLASS: String = "com.scottyab.rootbeer.RootBeer"
+const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.taxequalization.tools.utils.AttestationHelper"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
@@ -40,12 +40,10 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking RootBeer")
         // Hook RootBeer's isRooted() method
-        XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "n", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRootedWithoutBusyBoxCheck", XC_MethodReplacement.returnConstant(false))
 
         XposedBridge.log("Hooking AttestationHelper")
         // Hook method that checks whether hardware key attestation is supported
-        XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "b", XC_MethodReplacement.returnConstant(false))
-        // Hook method that checks whether hardware key attestation returns officially signed results
-        XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "i", XC_MethodReplacement.returnConstant(true))
+        XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "isBootStateOk", XC_MethodReplacement.returnConstant(true))
     }
 }
