@@ -3,5 +3,6 @@
     <string-array name="xposed_scope" translatable="false">
         <item>@string/digitales_amt_package_name</item>
         <item>@string/bmf2go_package_name</item>
+        <item>@string/serviceportal_bund_package_name</item>
     </string-array>
 </resources>

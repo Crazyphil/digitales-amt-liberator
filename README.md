@@ -4,6 +4,7 @@ This repository contains an [Xposed](https://github.com/rovo89/XposedBridge) mod
 These are
 * [Digitales Amt](https://play.google.com/store/apps/details?id=at.gv.oe.app) by Bundesministerium für Digitalisierung und Wirtschaftsort
 * [FinanzOnline [+]](https://play.google.com/store/apps/details?id=at.gv.bmf.bmf2go) by Bundesministerium für Finanzen
+* [SPB Serviceportal Bund](https://play.google.com/store/apps/details?id=at.gv.bka.serviceportal) by Bundeskanzleramt Oesterreich
 
 ## Mission statement
 
