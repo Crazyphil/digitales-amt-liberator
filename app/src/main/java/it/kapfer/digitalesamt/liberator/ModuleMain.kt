@@ -18,23 +18,26 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
     private lateinit var bmf2GoPackageName: String
     private lateinit var eduDigicardPackageName: String
+    private lateinit var serviceportalBundPackageName: String
 
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
         val moduleResources = XModuleResources.createInstance(startupParam.modulePath, null)
         digitalesAmtPackageName = moduleResources.getString(R.string.digitales_amt_package_name)
         bmf2GoPackageName = moduleResources.getString(R.string.bmf2go_package_name)
         eduDigicardPackageName = moduleResources.getString(R.string.edudigicard_package_name)
+        serviceportalBundPackageName = moduleResources.getString(R.string.serviceportal_bund_package_name)
     }
 
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         when (lpparam.packageName) {
-            digitalesAmtPackageName -> handleDigitalesAmt(lpparam)
+            digitalesAmtPackageName -> handleASitPlusIntegrityCheck(lpparam)
             bmf2GoPackageName -> handleBmf2Go(lpparam)
             eduDigicardPackageName -> handleEduDigicard(lpparam)
+            serviceportalBundPackageName -> handleASitPlusIntegrityCheck(lpparam)
         }
     }
 
-    private fun handleDigitalesAmt(lpparam: LoadPackageParam) {
+    private fun handleASitPlusIntegrityCheck(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking DeviceIntegrityCheck")
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)

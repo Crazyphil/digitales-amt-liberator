@@ -1,0 +1,56 @@
+name: Build Pull Request APK
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  apk:
+    permissions:
+      # Required to upload/save artifact, otherwise you'll get
+      # "Error: Resource not accessible by integration"
+      contents: write
+      # Required to post comment, otherwise you'll get
+      # "Error: Resource not accessible by integration"
+      pull-requests: write
+
+    name: Generate APK for pull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: adopt
+          java-version: 11
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build debug APK
+        uses: gradle/gradle-build-action@v2.7.0
+        with:
+          arguments: assembleDebug
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Add pull request artifact
+        uses: gavv/pull-request-artifacts@v1.1.0
+        with:
+          # Commit hash that triggered PR
+          commit: ${{ github.event.pull_request.head.sha }}
+          # Token for current repo (used to post PR comment)
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Upload artifacts to specific branch, usually the main branch is
+          # protected by rules so it's not possible to upload there
+          artifacts-branch: prartifacts
+          artifacts: |
+            app/build/outputs/apk/debug/app-debug.apk

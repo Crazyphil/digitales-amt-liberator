@@ -26,7 +26,7 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
 
       - name: Build debug APK
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.7.0
         with:
           arguments: assembleDebug
         env:
