@@ -1,18 +1,21 @@
 package it.kapfer.digitalesamt.liberator
 
 import android.content.res.XModuleResources
+import android.os.Build
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.io.File
 
 // Classes to hook in Digitales Amt app
 const val DEVICE_INTEGRITY_CHECK_CLASS: String = "at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck"
 // Classes to hook in FON [+] app
 const val ROOTBEER_CLASS: String = "com.scottyab.rootbeer.RootBeer"
-const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.taxequalization.tools.utils.AttestationHelper"
+const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.AttestationHelper"
+const val ATTESTATION_HELPER_CLASS_NEW: String = "at.gv.bmf.bmf2go.taxequalization.tools.utils.AttestationHelper"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
@@ -37,6 +40,18 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         }
     }
 
+    private fun getPackageVersion(lpparam: XC_LoadPackage.LoadPackageParam): Int {
+        val apkPath = File(lpparam.appInfo.sourceDir)
+        val packageParser = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val packageLite = XposedHelpers.callStaticMethod(packageParser, "parsePackageLite", apkPath, 0)
+            XposedHelpers.getIntField(packageLite, "versionCode")
+        } else {
+            val packageObject = XposedHelpers.callMethod(packageParser.newInstance(), "parsePackage", apkPath, 0)
+            XposedHelpers.getIntField(packageObject, "mVersionCode")
+        }
+    }
+
     private fun handleASitPlusIntegrityCheck(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking DeviceIntegrityCheck")
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
@@ -44,13 +59,27 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     }
 
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
-        XposedBridge.log("Hooking RootBeer")
-        // Hook RootBeer's isRooted() method
-        XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRootedWithoutBusyBoxCheck", XC_MethodReplacement.returnConstant(false))
+        if (getPackageVersion(lpparam) < 161) {
+            XposedBridge.log("Hooking RootBeer")
+            // Hook RootBeer's isRooted() method
+            XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "n", XC_MethodReplacement.returnConstant(false))
 
-        XposedBridge.log("Hooking AttestationHelper")
-        // Hook method that checks whether hardware key attestation is supported
-        XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "isBootStateOk", XC_MethodReplacement.returnConstant(true))
+            XposedBridge.log("Hooking AttestationHelper")
+            // Hook method that checks whether hardware key attestation is supported
+            XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "b", XC_MethodReplacement.returnConstant(false))
+            // Hook method that checks whether hardware key attestation returns officially signed results
+            XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "i", XC_MethodReplacement.returnConstant(true))
+        }
+        else {
+            XposedBridge.log("Detected new FIO [+] version")
+            XposedBridge.log("Hooking RootBeer")
+            // Hook RootBeer's isRooted() method
+            XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRootedWithoutBusyBoxCheck", XC_MethodReplacement.returnConstant(false))
+
+            XposedBridge.log("Hooking AttestationHelper")
+            // Hook method that checks whether hardware key attestation is supported
+            XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS_NEW, lpparam.classLoader, "isBootStateOk", XC_MethodReplacement.returnConstant(true))
+        }
     }
 
     private fun handleEduDigicard(lpparam: XC_LoadPackage.LoadPackageParam) {
