@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="xposed_scope" translatable="false">
-        <item>@string/digitales_amt_package_name</item>
         <item>@string/bmf2go_package_name</item>
+        <item>@string/digitales_amt_package_name</item>
         <item>@string/edudigicard_package_name</item>
         <item>@string/serviceportal_bund_package_name</item>
     </string-array>

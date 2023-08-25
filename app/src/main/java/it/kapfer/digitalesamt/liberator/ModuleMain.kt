@@ -6,7 +6,7 @@ import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
-import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 // Classes to hook in Digitales Amt app
 const val DEVICE_INTEGRITY_CHECK_CLASS: String = "at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck"
@@ -28,7 +28,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         serviceportalBundPackageName = moduleResources.getString(R.string.serviceportal_bund_package_name)
     }
 
-    override fun handleLoadPackage(lpparam: LoadPackageParam) {
+    override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         when (lpparam.packageName) {
             digitalesAmtPackageName -> handleASitPlusIntegrityCheck(lpparam)
             bmf2GoPackageName -> handleBmf2Go(lpparam)
@@ -43,7 +43,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)
     }
 
-    private fun handleBmf2Go(lpparam: LoadPackageParam) {
+    private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking RootBeer")
         // Hook RootBeer's isRooted() method
         XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRootedWithoutBusyBoxCheck", XC_MethodReplacement.returnConstant(false))
@@ -53,7 +53,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "isBootStateOk", XC_MethodReplacement.returnConstant(true))
     }
 
-    private fun handleEduDigicard(lpparam: LoadPackageParam) {
+    private fun handleEduDigicard(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking RootBeer")
         // Hook RootBeer's isRooted() method
         XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRooted", XC_MethodReplacement.returnConstant(false))
