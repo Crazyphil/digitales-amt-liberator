@@ -3,6 +3,7 @@
 This repository contains an [Xposed](https://github.com/rovo89/XposedBridge) module that removes root and bootloader checks from Austrian e-government apps.
 These are
 * [Digitales Amt](https://play.google.com/store/apps/details?id=at.gv.oe.app) by Bundesministerium für Digitalisierung und Wirtschaftsort
+* [edu.digicard](https://play.google.com/store/apps/details?id=at.asitplus.digitalid.wallet.pupilid) by BMBWF
 * [FinanzOnline [+]](https://play.google.com/store/apps/details?id=at.gv.bmf.bmf2go) by Bundesministerium für Finanzen
 * [SPB Serviceportal Bund](https://play.google.com/store/apps/details?id=at.gv.bka.serviceportal) by Bundeskanzleramt Oesterreich
 
