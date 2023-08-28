@@ -1,4 +1,4 @@
-# Digitales Amt Liberator
+# E-Government Liberator (formerly Digitales Amt Liberator)
 
 This repository contains an [Xposed](https://github.com/rovo89/XposedBridge) module that removes root and bootloader checks from Austrian e-government apps.
 These are
@@ -21,7 +21,7 @@ trusted. The result of this check cannot be faked in software because of the cry
 
 ### The solution
 
-*Digitales Amt Liberator* removes any calls in supported Austrian e-government apps to root and bootloader checks and therefore provides a tailored solution to
+*E-Government Liberator* removes any calls in supported Austrian e-government apps to root and bootloader checks and therefore provides a tailored solution to
 running the app on rooted devices.
 
 ## Installation
@@ -29,11 +29,11 @@ running the app on rooted devices.
 Install and activate Xposed or one of its derivatives. One of the more modern variants is [LSPosed](https://github.com/LSPosed/LSPosed#install). Ensure that
 loading Xposed modules for the supported apps is activated in the Xposed settings, and the app is not blocklisted in Magisk, if you use that.
 
-Download the `app-release.apk` file from the latest [Digitales Amt Liberator release](https://github.com/Crazyphil/digitales-amt-liberator/releases/latest) and
+Download the `app-release.apk` file from the latest [E-Government Liberator release](https://github.com/Crazyphil/digitales-amt-liberator/releases/latest) and
 install it on your device. After completion, you should be automatically prompted to activate the new Xposed module.
 
 Restart your device and ensure that the module is up and running in your Xposed settings. Ensure that all Austrian e-government apps you want to liberate are
-checked in the module's settings (tap on *Digitales Amt Liberator* on the *Modules* tab)
+checked in the module's settings (tap on *E-Government Liberator* on the *Modules* tab)
 
 You're done. Beginning with the next start of the app, you are able to connect your ID Austria to the app and use it for e-government stuff.
 
@@ -41,6 +41,6 @@ You're done. Beginning with the next start of the app, you are able to connect y
 
 The module is written in Kotlin. It only consists of one class, `it.kapfer.digitalesamt.liberator.ModuleMain`, which hooks loading supported apps' package
 loading process and replaces the calls to the root detection methods in the class responsible for this
-(`at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck`) to always indicate that the device is unmodified.
+(e.g. `at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck`) to always indicate that the device is unmodified.
 
 Build it using Gradle.
