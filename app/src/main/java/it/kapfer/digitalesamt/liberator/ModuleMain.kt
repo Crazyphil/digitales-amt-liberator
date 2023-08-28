@@ -65,6 +65,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
 
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (getPackageVersion(lpparam) < 161) {
+            XposedBridge.log("Detected FON [+] version < 3.0.0")
             XposedBridge.log("Hooking RootBeer")
             // Hook RootBeer's obfuscated isRooted() method
             XposedHelpers.findAndHookMethod(ROOTBEER_CLASS_FIO, lpparam.classLoader, "n", XC_MethodReplacement.returnConstant(false))
@@ -76,7 +77,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
             XposedHelpers.findAndHookMethod(ATTESTATION_HELPER_CLASS, lpparam.classLoader, "i", XC_MethodReplacement.returnConstant(true))
         }
         else {
-            XposedBridge.log("Detected new FIO [+] version")
+            XposedBridge.log("Detected FON [+] version >= 3.0.0")
             XposedBridge.log("Hooking RootBeer")
             // Hook RootBeer's isRooted() method
             XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRootedWithoutBusyBoxCheck", XC_MethodReplacement.returnConstant(false))
@@ -96,7 +97,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         // Hook RootBeer's isRooted() method
         XposedHelpers.findAndHookMethod(ROOTBEER_CLASS, lpparam.classLoader, "isRooted", XC_MethodReplacement.returnConstant(false))
 
-        XposedBridge.log("Hook HomeFragment")
+        XposedBridge.log("Hooking HomeFragment")
         // Hook HomeFragment's getHasAttestationCapabilities() method
         XposedHelpers.findAndHookMethod(HOMEFRAGMENT_CLASS, lpparam.classLoader, "getHasAttestationCapabilities", XC_MethodReplacement.returnConstant(true))
 
