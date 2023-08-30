@@ -4,4 +4,5 @@
     <string name="bmf2go_package_name" translatable="false">at.gv.bmf.bmf2go</string>
     <string name="edudigicard_package_name" translatable="false">at.asitplus.digitalid.wallet.pupilid</string>
     <string name="serviceportal_bund_package_name" translatable="false">at.gv.bka.serviceportal</string>
+    <string name="mobywatel_package_name" translatable="false">pl.nask.mobywatel</string>
 </resources>

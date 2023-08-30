@@ -1,5 +1,6 @@
 package it.kapfer.digitalesamt.liberator
 
+import android.content.Context
 import android.content.res.XModuleResources
 import android.os.Build
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -21,12 +22,15 @@ const val ROOTBEER_CLASS_FIO: String = "com.scottyab.rootbeer.b"
 const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.AttestationHelper"
 // Classes to hook in edu.digicard
 const val HOMEFRAGMENT_CLASS: String = "at.asitplus.digitalid.wallet.homescreen.HomeFragment\$Companion"
+// Classes to hook in mObywatel
+const val ROOTBEERNATIVE_CLASS_MOBYWATEL: String = "com.scottyab.rootbeer.RootBeerNative"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
     private lateinit var bmf2GoPackageName: String
     private lateinit var eduDigicardPackageName: String
     private lateinit var serviceportalBundPackageName: String
+    private lateinit var mobywatelPackageName: String
 
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
         val moduleResources = XModuleResources.createInstance(startupParam.modulePath, null)
@@ -34,6 +38,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         bmf2GoPackageName = moduleResources.getString(R.string.bmf2go_package_name)
         eduDigicardPackageName = moduleResources.getString(R.string.edudigicard_package_name)
         serviceportalBundPackageName = moduleResources.getString(R.string.serviceportal_bund_package_name)
+        mobywatelPackageName = moduleResources.getString(R.string.mobywatel_package_name)
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
@@ -42,6 +47,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
             bmf2GoPackageName -> handleBmf2Go(lpparam)
             eduDigicardPackageName -> handleEduDigicard(lpparam)
             serviceportalBundPackageName -> handleASitPlusIntegrityCheck(lpparam)
+            mobywatelPackageName -> handleMobywatel(lpparam)
         }
     }
 
@@ -111,5 +117,29 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
             }
         })
         */
+    }
+
+    private fun handleMobywatel(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Hooking RootBeer")
+        //Hook RootBeerNative
+        XposedHelpers.findAndHookMethod("com.scottyab.rootbeer.RootBeerNative", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false))
+
+        XposedBridge.log("Hooking all the obfuscated root checks")
+        //Hook PackageManager check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "r", List::class.java, XC_MethodReplacement.returnConstant(false))
+        //Hook path existence check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "b", String::class.java, XC_MethodReplacement.returnConstant(false))
+        //Hook ro.debuggable and ro.secure check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "d", XC_MethodReplacement.returnConstant(false))
+        //Hook mount rw check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "g", XC_MethodReplacement.returnConstant(false))
+        //Hook RootBeer check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "h", XC_MethodReplacement.returnConstant(false))
+        //Hook `which su` check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "j", XC_MethodReplacement.returnConstant(false))
+        //Hook test-key build tag check
+        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "q", XC_MethodReplacement.returnConstant(false))
+        //Hook PackageManager check
+        XposedHelpers.findAndHookMethod("c5.a", lpparam.classLoader, "h", Context::class.java, String::class.java, XC_MethodReplacement.returnConstant(false))
     }
 }
