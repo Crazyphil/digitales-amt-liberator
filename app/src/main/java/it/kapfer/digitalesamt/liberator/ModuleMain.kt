@@ -24,6 +24,8 @@ const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.Attes
 const val HOMEFRAGMENT_CLASS: String = "at.asitplus.digitalid.wallet.homescreen.HomeFragment\$Companion"
 // Classes to hook in mObywatel
 const val ROOTBEERNATIVE_CLASS_MOBYWATEL: String = "com.scottyab.rootbeer.RootBeerNative"
+const val ROOTCHECKS_MOBYWATEL: String = "fe.b"
+const val MORE_ROOTCHECKS_MOBYWATEL: String = "c5.a"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
@@ -122,24 +124,24 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private fun handleMobywatel(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking RootBeer")
         //Hook RootBeerNative
-        XposedHelpers.findAndHookMethod("com.scottyab.rootbeer.RootBeerNative", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTBEERNATIVE_CLASS_MOBYWATEL, lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false))
 
         XposedBridge.log("Hooking all the obfuscated root checks")
         //Hook PackageManager check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "r", List::class.java, XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "r", List::class.java, XC_MethodReplacement.returnConstant(false))
         //Hook path existence check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "b", String::class.java, XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "b", String::class.java, XC_MethodReplacement.returnConstant(false))
         //Hook ro.debuggable and ro.secure check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "d", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "d", XC_MethodReplacement.returnConstant(false))
         //Hook mount rw check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "g", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "g", XC_MethodReplacement.returnConstant(false))
         //Hook RootBeer check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "h", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "h", XC_MethodReplacement.returnConstant(false))
         //Hook `which su` check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "j", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "j", XC_MethodReplacement.returnConstant(false))
         //Hook test-key build tag check
-        XposedHelpers.findAndHookMethod("fe.b", lpparam.classLoader, "q", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "q", XC_MethodReplacement.returnConstant(false))
         //Hook PackageManager check
-        XposedHelpers.findAndHookMethod("c5.a", lpparam.classLoader, "h", Context::class.java, String::class.java, XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(MORE_ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "h", Context::class.java, String::class.java, XC_MethodReplacement.returnConstant(false))
     }
 }
