@@ -23,7 +23,7 @@ const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.Attes
 // Classes to hook in edu.digicard
 const val HOMEFRAGMENT_CLASS: String = "at.asitplus.digitalid.wallet.homescreen.HomeFragment\$Companion"
 // Classes to hook in mObywatel
-const val ROOTBEERNATIVE_CLASS_MOBYWATEL: String = "com.scottyab.rootbeer.RootBeerNative"
+const val ROOTBEER_CLASS_MOBYWATEL: String = "com.scottyab.rootbeer.RootBeerNative"
 const val ROOTCHECKS_MOBYWATEL: String = "fe.b"
 const val MORE_ROOTCHECKS_MOBYWATEL: String = "c5.a"
 
@@ -124,7 +124,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private fun handleMobywatel(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Hooking RootBeer")
         //Hook RootBeerNative
-        XposedHelpers.findAndHookMethod(ROOTBEERNATIVE_CLASS_MOBYWATEL, lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false))
+        XposedHelpers.findAndHookMethod(ROOTBEER_CLASS_MOBYWATEL, lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false))
 
         XposedBridge.log("Hooking all the obfuscated root checks")
         //Hook PackageManager check
