@@ -69,6 +69,7 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         XposedBridge.log("Hooking DeviceIntegrityCheck")
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)
+        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
     }
 
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
