@@ -45,10 +45,10 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         when (lpparam.packageName) {
-            digitalesAmtPackageName -> handleASitPlusIntegrityCheck(lpparam)
+            digitalesAmtPackageName -> handleDigitalesAmt(lpparam)
             bmf2GoPackageName -> handleBmf2Go(lpparam)
             eduDigicardPackageName -> handleEduDigicard(lpparam)
-            serviceportalBundPackageName -> handleASitPlusIntegrityCheck(lpparam)
+            serviceportalBundPackageName -> handleServicePortalBund(lpparam)
             mobywatelPackageName -> handleMobywatel(lpparam)
         }
     }
@@ -69,9 +69,23 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         XposedBridge.log("Hooking DeviceIntegrityCheck")
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
         XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)
-        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
     }
 
+    private fun handleDigitalesAmt(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Detected Digitales Amt")
+        if (getPackageVersion(lpparam) >= 2024011841) {
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
+        }
+        handleASitPlusIntegrityCheck(lpparam)
+    }
+
+    private fun handleServicePortalBund(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Detected Serviceportal Bund")
+        if (getPackageVersion(lpparam) >= 2023122250) {
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
+        }
+        handleASitPlusIntegrityCheck(lpparam)
+    }
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (getPackageVersion(lpparam) < 161) {
             XposedBridge.log("Detected FON [+] version < 3.0.0")
@@ -110,7 +124,6 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         // Hook HomeFragment's getHasAttestationCapabilities() method
         XposedHelpers.findAndHookMethod(HOMEFRAGMENT_CLASS, lpparam.classLoader, "getHasAttestationCapabilities", XC_MethodReplacement.returnConstant(true))
 
-        /*
         // TODO: find out how attestation in edu.digicard works
         XposedBridge.log("Hooking KeyGenParameterSpec")
         XposedHelpers.findAndHookMethod(KEYGENPARAMETERSPEC_CLASS, lpparam.classLoader, "setAttestationChallenge", ByteArray::class.java, object :
@@ -119,7 +132,6 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
                 param?.args?.set(0, null) // set the attestation bytes to null -> silently fails attestation
             }
         })
-        */
     }
 
     private fun handleMobywatel(lpparam: XC_LoadPackage.LoadPackageParam) {
