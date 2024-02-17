@@ -24,15 +24,15 @@ android {
             keyPassword keystoreProperties['build.keyPassword']
         }
     }
-    compileSdk 33
+    compileSdk 34
 
     namespace "it.kapfer.digitalesamt.liberator"
     defaultConfig {
         applicationId android.namespace
         minSdk 21
-        targetSdk 33
         versionCode 3
         versionName "2.0"
+        targetSdk 34
     }
 
     buildTypes {
@@ -55,6 +55,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
     compileOnly 'de.robv.android.xposed:api:82'
 }
