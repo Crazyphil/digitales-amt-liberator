@@ -30,9 +30,9 @@ android {
     defaultConfig {
         applicationId android.namespace
         minSdk 21
-        versionCode 3
-        versionName "2.0"
         targetSdk 34
+        versionCode 4
+        versionName "2.1"
     }
 
     buildTypes {
