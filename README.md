@@ -10,7 +10,7 @@ These are
 As an additional bonus, this module also supports some other apps with those kinds of checks, but doesn't offer first-class support for them (i.e. if something
 breaks, it won't be fixed until someone [creates an issue](https://github.com/Crazyphil/digitales-amt-liberator/issues/new/choose)). This is not because we are mean,
 but none of the authors use these apps and therefore will not notice for themselves when something goes wrong.
-* [mObywatel](https://play.google.com/store/apps/details?id=pl.nask.mobywatel) by Ministerstwo Cyfryzacji :flag_poland:
+* [mObywatel](https://play.google.com/store/apps/details?id=pl.nask.mobywatel) by Ministerstwo Cyfryzacji 🇵🇱
 
 ## Mission statement
 
