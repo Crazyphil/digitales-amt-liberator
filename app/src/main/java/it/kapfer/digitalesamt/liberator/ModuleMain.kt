@@ -24,8 +24,8 @@ const val ATTESTATION_HELPER_CLASS: String = "at.gv.bmf.bmf2go.tools.utils.Attes
 const val HOMEFRAGMENT_CLASS: String = "at.asitplus.digitalid.wallet.homescreen.HomeFragment\$Companion"
 // Classes to hook in mObywatel
 const val ROOTBEER_CLASS_MOBYWATEL: String = "com.scottyab.rootbeer.RootBeerNative"
-const val ROOTCHECKS_MOBYWATEL: String = "fe.b"
-const val MORE_ROOTCHECKS_MOBYWATEL: String = "c5.a"
+const val ROOTCHECKS_MOBYWATEL: String = "E6.b"
+const val MORE_ROOTCHECKS_MOBYWATEL: String = "Do.p"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private lateinit var digitalesAmtPackageName: String
