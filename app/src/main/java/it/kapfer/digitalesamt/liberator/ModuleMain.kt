@@ -15,7 +15,6 @@ import java.io.File
 // Classes used by multiple apps
 const val ROOTBEER_CLASS: String = "com.scottyab.rootbeer.RootBeer"
 const val KEYGENPARAMETERSPEC_CLASS: String = "android.security.keystore.KeyGenParameterSpec.Builder"
-// Classes to hook in Digitales Amt app
 const val DEVICE_INTEGRITY_CHECK_CLASS: String = "at.asitplus.utils.deviceintegrity.DeviceIntegrityCheck"
 // Classes to hook in FON [+] app
 const val ROOTBEER_CLASS_FIO: String = "com.scottyab.rootbeer.b"
@@ -82,7 +81,14 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
     private fun handleServicePortalBund(lpparam: XC_LoadPackage.LoadPackageParam) {
         XposedBridge.log("Detected Serviceportal Bund")
         if (getPackageVersion(lpparam) >= 2023122250) {
+            XposedBridge.log("Hooking attestationSupportCheck")
             XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
+        }
+        if (getPackageVersion(lpparam) >= 2024071055) {
+            XposedBridge.log("Hooking rootCheck")
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "rootCheck", Boolean::class.java, XC_MethodReplacement.DO_NOTHING)
+            XposedBridge.log("Hooking bootloaderCheck")
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "bootloaderCheck", Boolean::class.java, XC_MethodReplacement.returnConstant(true))
         }
         handleASitPlusIntegrityCheck(lpparam)
     }
