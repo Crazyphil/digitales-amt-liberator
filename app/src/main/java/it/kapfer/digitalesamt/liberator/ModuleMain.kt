@@ -10,6 +10,7 @@ import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 import java.io.File
 
 // Classes used by multiple apps
@@ -27,71 +28,31 @@ const val ROOTCHECKS_MOBYWATEL: String = "E6.b"
 const val MORE_ROOTCHECKS_MOBYWATEL: String = "Do.p"
 
 class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
-    private lateinit var digitalesAmtPackageName: String
     private lateinit var bmf2GoPackageName: String
+    private lateinit var digitalesAmtPackageName: String
     private lateinit var eduDigicardPackageName: String
-    private lateinit var serviceportalBundPackageName: String
     private lateinit var mobywatelPackageName: String
+    private lateinit var serviceportalBundPackageName: String
 
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
         val moduleResources = XModuleResources.createInstance(startupParam.modulePath, null)
-        digitalesAmtPackageName = moduleResources.getString(R.string.digitales_amt_package_name)
         bmf2GoPackageName = moduleResources.getString(R.string.bmf2go_package_name)
+        digitalesAmtPackageName = moduleResources.getString(R.string.digitales_amt_package_name)
         eduDigicardPackageName = moduleResources.getString(R.string.edudigicard_package_name)
-        serviceportalBundPackageName = moduleResources.getString(R.string.serviceportal_bund_package_name)
         mobywatelPackageName = moduleResources.getString(R.string.mobywatel_package_name)
+        serviceportalBundPackageName = moduleResources.getString(R.string.serviceportal_bund_package_name)
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         when (lpparam.packageName) {
-            digitalesAmtPackageName -> handleDigitalesAmt(lpparam)
             bmf2GoPackageName -> handleBmf2Go(lpparam)
+            digitalesAmtPackageName -> handleDigitalesAmt(lpparam)
             eduDigicardPackageName -> handleEduDigicard(lpparam)
-            serviceportalBundPackageName -> handleServicePortalBund(lpparam)
             mobywatelPackageName -> handleMobywatel(lpparam)
+            serviceportalBundPackageName -> handleServicePortalBund(lpparam)
         }
     }
 
-    private fun getPackageVersion(lpparam: XC_LoadPackage.LoadPackageParam): Int {
-        val apkPath = File(lpparam.appInfo.sourceDir)
-        val packageParser = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val packageLite = XposedHelpers.callStaticMethod(packageParser, "parsePackageLite", apkPath, 0)
-            XposedHelpers.getIntField(packageLite, "versionCode")
-        } else {
-            val packageObject = XposedHelpers.callMethod(packageParser.newInstance(), "parsePackage", apkPath, 0)
-            XposedHelpers.getIntField(packageObject, "mVersionCode")
-        }
-    }
-
-    private fun handleASitPlusIntegrityCheck(lpparam: XC_LoadPackage.LoadPackageParam) {
-        XposedBridge.log("Hooking DeviceIntegrityCheck")
-        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
-        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)
-    }
-
-    private fun handleDigitalesAmt(lpparam: XC_LoadPackage.LoadPackageParam) {
-        XposedBridge.log("Detected Digitales Amt")
-        if (getPackageVersion(lpparam) >= 2024011841) {
-            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
-        }
-        handleASitPlusIntegrityCheck(lpparam)
-    }
-
-    private fun handleServicePortalBund(lpparam: XC_LoadPackage.LoadPackageParam) {
-        XposedBridge.log("Detected Serviceportal Bund")
-        if (getPackageVersion(lpparam) >= 2023122250) {
-            XposedBridge.log("Hooking attestationSupportCheck")
-            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
-        }
-        if (getPackageVersion(lpparam) >= 2024071055) {
-            XposedBridge.log("Hooking rootCheck")
-            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "rootCheck", Boolean::class.java, XC_MethodReplacement.DO_NOTHING)
-            XposedBridge.log("Hooking bootloaderCheck")
-            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "bootloaderCheck", Boolean::class.java, XC_MethodReplacement.returnConstant(true))
-        }
-        handleASitPlusIntegrityCheck(lpparam)
-    }
     private fun handleBmf2Go(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (getPackageVersion(lpparam) < 161) {
             XposedBridge.log("Detected FON [+] version < 3.0.0")
@@ -119,6 +80,14 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
                 }
             })
         }
+    }
+
+    private fun handleDigitalesAmt(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Detected Digitales Amt")
+        if (getPackageVersion(lpparam) >= 2024011841) {
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
+        }
+        handleASitPlusIntegrityCheck(lpparam)
     }
 
     private fun handleEduDigicard(lpparam: XC_LoadPackage.LoadPackageParam) {
@@ -162,5 +131,41 @@ class ModuleMain : IXposedHookZygoteInit, IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod(ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "q", XC_MethodReplacement.returnConstant(false))
         //Hook PackageManager check
         XposedHelpers.findAndHookMethod(MORE_ROOTCHECKS_MOBYWATEL, lpparam.classLoader, "h", Context::class.java, String::class.java, XC_MethodReplacement.returnConstant(false))
+    }
+
+    private fun handleServicePortalBund(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Detected Serviceportal Bund")
+        if (getPackageVersion(lpparam) >= 2023122250) {
+            XposedBridge.log("Hooking attestationSupportCheck")
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "attestationSupportCheck", XC_MethodReplacement.DO_NOTHING)
+        }
+        if (getPackageVersion(lpparam) >= 2024071055) {
+            XposedBridge.log("Hooking rootCheck")
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "rootCheck", Boolean::class.java, XC_MethodReplacement.DO_NOTHING)
+            XposedBridge.log("Hooking bootloaderCheck")
+            XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "bootloaderCheck", Boolean::class.java, XC_MethodReplacement.returnConstant(true))
+        }
+        handleASitPlusIntegrityCheck(lpparam)
+    }
+
+    private fun getPackageVersion(lpparam: XC_LoadPackage.LoadPackageParam): Int {
+        val apkPath = File(lpparam.appInfo.sourceDir)
+        val packageParser = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/PackageParser\$PackageLite;")
+        }
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val packageLite = XposedHelpers.callStaticMethod(packageParser, "parsePackageLite", apkPath, 0)
+            XposedHelpers.getIntField(packageLite, "versionCode")
+        } else {
+            val packageObject = XposedHelpers.callMethod(packageParser.getDeclaredConstructor().newInstance(), "parsePackage", apkPath, 0)
+            XposedHelpers.getIntField(packageObject, "mVersionCode")
+        }
+    }
+
+    private fun handleASitPlusIntegrityCheck(lpparam: XC_LoadPackage.LoadPackageParam) {
+        XposedBridge.log("Hooking DeviceIntegrityCheck")
+        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrity", XC_MethodReplacement.DO_NOTHING)
+        XposedHelpers.findAndHookMethod(DEVICE_INTEGRITY_CHECK_CLASS, lpparam.classLoader, "checkIntegrityForceCheck", XC_MethodReplacement.DO_NOTHING)
     }
 }
