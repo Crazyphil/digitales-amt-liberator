@@ -2,15 +2,37 @@
 
 This repository contains an [Xposed](https://github.com/rovo89/XposedBridge) module that removes root and bootloader checks from Austrian e-government apps.
 These are
+
 * [Digitales Amt](https://play.google.com/store/apps/details?id=at.gv.oe.app) by Bundesministerium für Digitalisierung und Wirtschaftsort
 * [edu.digicard](https://play.google.com/store/apps/details?id=at.asitplus.digitalid.wallet.pupilid) by BMBWF
 * [FinanzOnline [+]](https://play.google.com/store/apps/details?id=at.gv.bmf.bmf2go) by Bundesministerium für Finanzen
 * [SPB Serviceportal Bund](https://play.google.com/store/apps/details?id=at.gv.bka.serviceportal) by Bundeskanzleramt Oesterreich
 
 As an additional bonus, this module also supports some other apps with those kinds of checks, but doesn't offer first-class support for them (i.e. if something
-breaks, it won't be fixed until someone [creates an issue](https://github.com/Crazyphil/digitales-amt-liberator/issues/new/choose)). This is not because we are mean,
+breaks, it won't be fixed until someone [creates an issue](https://github.com/Crazyphil/digitales-amt-liberator/issues/new/choose)). This is not because we are
+mean,
 but none of the authors use these apps and therefore will not notice for themselves when something goes wrong.
+
 * [mObywatel](https://play.google.com/store/apps/details?id=pl.nask.mobywatel) by Ministerstwo Cyfryzacji 🇵🇱
+
+### The app I use is not listed above
+
+Adding support for apps typically isn't easy. The app has to be reverse-engineered to find all checks and override them so they don't do anything. Typically,
+these apps are also security-critical (which is why they bother with rooted devices in the first place) and therefore heavily obfuscated, so reverse-engineering
+is even more difficult. Getting an app to work with E-Government Liberator needs hours to weeks of work. Sometimes, if server-side checks are involved, it is
+even impossible to get them to run on rooted devices.
+
+This means that a developer has to actively benefit from including a new app to this module. This benefit usually comes directly from personally being able to
+use the app afterwards, or indirectly from the fun of reverse-engineering it an learning something through the process. And then there's always the risk of the
+app breaking again after each update, which potentially means going back to start.
+
+We collect all apps requested by users under the
+[`app-support` label](https://github.com/Crazyphil/digitales-amt-liberator/issues?q=is%3Aissue+is%3Aopen+label%3Aapp-support)
+in the issues.\
+If you are a developer and see yourself up to the challenge, feel free to try implementing support for an app. For information about development,
+see the [Development](#development) section. Don't hesitate to write a comment in the issue if you need help.\
+If you are a user of an unsupported app,
+[create an issue](https://github.com/Crazyphil/digitales-amt-liberator/issues/new?assignees=&labels=app-support&projects=&template=app-support.md&title=Support+for+%5BName+of+the+app%5D).
 
 ## Mission statement
 
@@ -20,7 +42,7 @@ When your Android phone is rooted or its bootloader unlocked, the app starts, bu
 "security reasons"), or it already denies starting for the same reason. This makes the e-government app basically useless.
 
 To check for rooted devices, it utilizes the [RootBeer](https://github.com/scottyab/rootbeer) library. This check can easily be circumvented, for example with
-the [Universal SafetyNet Fix](https://github.com/kdrag0n/safetynet-fix) module for [Magisk](https://github.com/topjohnwu/Magisk). However, to test for an
+the [Play Integrity Fix](https://github.com/chiteroman/PlayIntegrityFix) module for [Magisk](https://github.com/topjohnwu/Magisk). However, to test for an
 unlocked bootloader, it checks whether the certificate chain for [Key Attestation](https://developer.android.com/training/articles/security-key-attestation) is
 trusted. The result of this check cannot be faked in software because of the cryptography used.
 
@@ -31,7 +53,7 @@ running the app on rooted devices.
 
 ## Installation
 
-Install and activate Xposed or one of its derivatives. One of the more modern variants is [LSPosed](https://github.com/LSPosed/LSPosed#install). Ensure that
+Install and activate Xposed or one of its derivatives. One of the more modern variants is [LSPosed](https://github.com/JingMatrix/LSPosed#install). Ensure that
 loading Xposed modules for the supported apps is activated in the Xposed settings, and the app is not blocklisted in Magisk, if you use that.
 
 Download the `app-release.apk` file from the latest [E-Government Liberator release](https://github.com/Crazyphil/digitales-amt-liberator/releases/latest) and
