@@ -72,10 +72,14 @@ jobs:
         with:
           name: apk
 
+      - name: Display structure of downloaded artifact
+        run: ls -R
+        shell: bash
+
       - name: Upload Release APK
         uses: softprops/action-gh-release@v2
         with:
-          files: apk/*
+          files: '*.apk'
           prerelease: ${{ contains(github.ref_name, '-') }}
           fail_on_unmatched_files: true
           generate_release_notes: true
